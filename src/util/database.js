@@ -1,29 +1,16 @@
-import MongoClient from 'mongodb';
+import MongoClient, { connect } from 'mongodb';
 import colors from 'colors';
 
-let _db;
-const url = 'mongodb://localhost:27017';
-const dbName = 'test';
 
-const mongoConnect = callback => {
-    MongoClient.connect(url, { useUnifiedTopology: true })
-               .then( client => {
-                   console.log(`Connected successfully to ${colors.blue('MongoDB!')}`);
-                   _db = client.db(dbName);
-                   callback();
-               })
-               .catch(error => {
-                   console.error(`${error}`);
-                   throw new Error(`${error}`);
-                });
+export async function mongoConnect() {
+
+    try {
+         const client = await MongoClient.connect('mongodb://localhost:27017', 
+         {  useUnifiedTopology: true });
+         const db = client.db('news');
+         console.log(`Connected to MongoDB successfull!`);
+         return db;
+    } catch (error) {
+         throw new Error(`${error}`);
+    }
 }
-
-const getDB = () => {
-    if (_db) {
-        return _db;
-    } 
-    throw new Error(`Error: No database found!`);
-} 
-
-exports.mongoConnect = mongoConnect;
-exports.getDB = getDB;
